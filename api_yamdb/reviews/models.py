@@ -45,14 +45,14 @@ class Comments(models.Model):
 
     review = models.ForeignKey(
         Review,
-        on_delete=models.SET_NULL,
+        on_delete=models.CASCADE,
         related_name="comments",
         blank=True,
         null=True,
     )
     text = models.CharField()
     author = models.ForeignKey(
-        User, on_delete=models.SET_NULL, related_name="comments"
+        User, on_delete=models.CASCADE, related_name="comments"
     )
     pub_data = models.DateTimeField(
         "Дата публикации комментария", auto_now_add=True

@@ -40,7 +40,7 @@ class Review(models.Model):
         return self.text[: self.text_for_view]
 
 
-class Comments(models.Model):
+class Comment(models.Model):
     """Model Comments from reviews app."""
 
     review = models.ForeignKey(

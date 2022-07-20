@@ -1,4 +1,4 @@
-from django.core.validators import MinValueValidator
+from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.db.models import Avg
 import datetime
@@ -32,7 +32,7 @@ class Title(models.Model):
     name = models.CharField(max_length=512)
     year = models.PositiveIntegerField(
         default=current_year(),
-        validators=[MinValueValidator(0), current_year()],
+        validators=[MinValueValidator(0), MaxValueValidator(current_year())],
     )
     description = models.TextField(max_length=1024)
     genre = models.ForeignKey(

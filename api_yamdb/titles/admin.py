@@ -14,10 +14,10 @@ class GenreAdmin(admin.ModelAdmin):
 
 
 class TitleAdmin(admin.ModelAdmin):
-    list_display = ("pk", "name", "year", "description", "genre", "category")
+    list_display = ("id", "name", "year", "description", "genre", "category")
     search_fields = ("name", "year", "genre", "category")
     list_filter = (
-        "pk",
+        "id",
         "year",
     )
     empty_value_field = "-пусто-"

@@ -50,6 +50,7 @@ class Title(models.Model):
         null=True,
     )
 
+    # Получение среднего значения рейтинга
     @property
     def rating(self):
         return self.reviews.aggregate(avg_score=Avg("score"))["avg_score"]

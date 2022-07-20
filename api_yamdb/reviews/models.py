@@ -37,7 +37,7 @@ class Review(models.Model):
         ]
 
     def __str__(self):
-        return self.text[: self.text_for_view]
+        return self.text[:text_for_view]
 
 
 class Comment(models.Model):
@@ -59,4 +59,4 @@ class Comment(models.Model):
     )
 
     def __str__(self):
-        return self.text[: self.text_for_view]
+        return self.text[:text_for_view]

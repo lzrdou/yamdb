@@ -39,13 +39,7 @@ class Title(models.Model):
         blank=True,
         null=True,
     )
-    genre = models.ForeignKey(
-        Genre,
-        on_delete=models.SET_NULL,
-        related_name="titles",
-        blank=True,
-        null=True,
-    )
+    genre = models.ManyToManyField(Genre)
     category = models.ForeignKey(
         Category,
         on_delete=models.SET_NULL,
@@ -58,3 +52,11 @@ class Title(models.Model):
     @property
     def rating(self):
         return self.reviews.aggregate(avg_score=Avg("score"))["avg_score"]
+
+
+class GenreTitle(models.Model):
+    title = models.ForeignKey(Title, on_delete=models.CASCADE)
+    genre = models.ForeignKey(Genre, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f"{self.title} {self.genre}"

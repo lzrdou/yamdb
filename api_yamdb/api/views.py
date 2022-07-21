@@ -1,8 +1,13 @@
 import uuid
+from django_filters.rest_framework import DjangoFilterBackend
 from django.shortcuts import get_object_or_404
+from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.response import Response
-from rest_framework import viewsets, status
-from rest_framework.permissions import IsAuthenticated
+from rest_framework import filters, viewsets, status
+from rest_framework.permissions import (
+    IsAuthenticated,
+    IsAuthenticatedOrReadOnly,
+)
 from rest_framework.views import APIView
 from .permissions import AdminPermission
 
@@ -11,20 +16,19 @@ from django.core.mail import send_mail
 from rest_framework.decorators import api_view
 
 from reviews.models import Review
-from titles.models import Title
+from titles.models import Category, Genre, Title
 from users.models import User
-from serializers import (
+from .serializers import (
     UserSerializer,
     ConfirmationCodeSerializer,
     UserEmailSerializer,
     UserInfoSerializers,
+    CategorySerializer,
+    GenreSerializer,
+    TitleSerializer,
     ReviewSerializer,
     CommentSerializer,
 )
-
-#     CategorySerializer,
-#     GenreSerializer,
-#     TitleSerializer,
 
 
 class ReviewViewSet(viewsets.ModelViewSet):
@@ -54,15 +58,33 @@ class CommentViewSet(viewsets.ModelViewSet):
 
 
 class CategoryViewSet(viewsets.ModelViewSet):
-    pass
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
+    permission_classes = [IsAuthenticatedOrReadOnly, AdminPermission]
+    pagination_class = [LimitOffsetPagination]
+    filter_backends = (filters.SearchFilter,)
+    search_fields = ("name",)
 
 
 class GenreViewSet(viewsets.ModelViewSet):
-    pass
+    queryset = Genre.objects.all()
+    serializer_class = GenreSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly, AdminPermission]
+    pagination_class = [LimitOffsetPagination]
+    filter_backends = (filters.SearchFilter,)
+    search_fields = ("name",)
 
 
 class TitleViewSet(viewsets.ModelViewSet):
-    pass
+    queryset = Title.objects.all()
+    serializer_class = TitleSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly, AdminPermission]
+    pagination_class = [LimitOffsetPagination]
+    filter_backends = (
+        DjangoFilterBackend,
+        filters.SearchFilter,
+    )
+    filterset_fields = ("category", "genre", "name", "year")
 
 
 class UserViewSet(viewsets.ModelViewSet):

@@ -11,7 +11,7 @@ def current_year():
 
 # Категория
 class Category(models.Model):
-    name = models.CharField(max_length=200)
+    name = models.CharField(max_length=256)
     slug = models.SlugField(unique=True)
 
     def __str__(self):
@@ -20,7 +20,7 @@ class Category(models.Model):
 
 # Жанр
 class Genre(models.Model):
-    name = models.CharField(max_length=200)
+    name = models.CharField(max_length=256)
     slug = models.SlugField(unique=True)
 
     def __str__(self):
@@ -34,14 +34,12 @@ class Title(models.Model):
         default=current_year(),
         validators=[MinValueValidator(0), MaxValueValidator(current_year())],
     )
-    description = models.TextField(max_length=1024)
-    genre = models.ForeignKey(
-        Genre,
-        on_delete=models.SET_NULL,
-        related_name="titles",
+    description = models.TextField(
+        max_length=1024,
         blank=True,
         null=True,
     )
+    genre = models.ManyToManyField(Genre)
     category = models.ForeignKey(
         Category,
         on_delete=models.SET_NULL,

@@ -12,7 +12,7 @@ class User(AbstractUser):
         (ADMIN, "admin"),
     ]
 
-    username = models.CharField(max_length=30, unique=True)
+    username = models.CharField(max_length=150, unique=True)
     email = models.EmailField(unique=True)
     bio = models.CharField(max_length=100, blank=True)
     role = models.CharField(

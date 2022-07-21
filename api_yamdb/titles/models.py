@@ -11,7 +11,7 @@ def current_year():
 
 # Категория
 class Category(models.Model):
-    name = models.CharField(max_length=200)
+    name = models.CharField(max_length=256)
     slug = models.SlugField(unique=True)
 
     def __str__(self):
@@ -20,7 +20,7 @@ class Category(models.Model):
 
 # Жанр
 class Genre(models.Model):
-    name = models.CharField(max_length=200)
+    name = models.CharField(max_length=256)
     slug = models.SlugField(unique=True)
 
     def __str__(self):

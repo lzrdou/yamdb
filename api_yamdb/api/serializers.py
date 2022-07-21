@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
 # from reviews.models import Review, Comment
-# from titles.models import Category, Genre, Title
+from titles.models import Category, Genre, Title
 from users.models import User
 
 
@@ -14,15 +14,29 @@ class CommentSerializer(serializers.ModelSerializer):
 
 
 class CategorySerializer(serializers.ModelSerializer):
-    pass
+    class Meta:
+        model = Category
+        fields = ("name", "slug")
 
 
 class GenreSerializer(serializers.ModelSerializer):
-    pass
+    class Meta:
+        model = Genre
+        fields = ("name", "slug")
 
 
 class TitleSerializer(serializers.ModelSerializer):
-    pass
+    description = serializers.CharField(allow_blank=True)
+    category = serializers.SlugRelatedField(
+        slug_field="slug", queryset=Category.objects.all()
+    )
+    genre = serializers.SlugRelatedField(
+        many=True, slug_field="slug", queryset=Genre.objects.all()
+    )
+
+    class Meta:
+        model = Title
+        fields = "__all__"
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -39,7 +53,7 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class UserEmailSerializer(serializers.Serializer):
-    emali = serializers.EmailField(required=True)
+    email = serializers.EmailField(required=True)
 
 
 class ConfirmationCodeSerializer(serializers.Serializer):

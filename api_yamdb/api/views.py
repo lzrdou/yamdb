@@ -18,7 +18,7 @@ from rest_framework.decorators import api_view
 # from reviews.models import Review, Comment
 from titles.models import Category, Genre, Title
 from users.models import User
-from serializers import (
+from .serializers import (
     UserSerializer,
     ConfirmationCodeSerializer,
     UserEmailSerializer,

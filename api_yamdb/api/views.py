@@ -9,6 +9,7 @@ from rest_framework.permissions import (
     IsAuthenticatedOrReadOnly,
 )
 from rest_framework.views import APIView
+from rest_framework.serializers import ValidationError
 
 from rest_framework_simplejwt.tokens import AccessToken
 from django.core.mail import send_mail
@@ -45,7 +46,11 @@ class ReviewViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         """Perform_create для ReviewViewSet (api, author=request.user)."""
-        serializer.save(author=self.request.user)
+        title_id = self.kwargs.get("title_id")
+        author = self.request.user
+        if Review.objects.filter(title=title_id, author=author).exists():
+            raise ValidationError("Можно оставить только один отзыв.")
+        serializer.save(author=author)
 
 
 class CommentViewSet(viewsets.ModelViewSet):

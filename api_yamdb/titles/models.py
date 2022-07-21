@@ -34,14 +34,12 @@ class Title(models.Model):
         default=current_year(),
         validators=[MinValueValidator(0), MaxValueValidator(current_year())],
     )
-    description = models.TextField(max_length=1024)
-    genre = models.ForeignKey(
-        Genre,
-        on_delete=models.SET_NULL,
-        related_name="titles",
+    description = models.TextField(
+        max_length=1024,
         blank=True,
         null=True,
     )
+    genre = models.ManyToManyField(Genre)
     category = models.ForeignKey(
         Category,
         on_delete=models.SET_NULL,

@@ -18,7 +18,7 @@ class User(AbstractUser):
     role = models.CharField(
         choices=USER_ROLE, max_length=9, blank=True, null=True, default=USER
     )
-    password = models.CharField(max_length=128, required=False)
+    password = None
 
     @property
     def is_user(self):

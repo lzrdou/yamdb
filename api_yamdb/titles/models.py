@@ -34,7 +34,11 @@ class Title(models.Model):
         default=current_year(),
         validators=[MinValueValidator(0), MaxValueValidator(current_year())],
     )
-    description = models.TextField(max_length=1024)
+    description = models.TextField(
+        max_length=1024,
+        blank=True,
+        null=True,
+    )
     genre = models.ForeignKey(
         Genre,
         on_delete=models.SET_NULL,

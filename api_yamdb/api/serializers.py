@@ -45,3 +45,19 @@ class UserEmailSerializer(serializers.Serializer):
 class ConfirmationCodeSerializer(serializers.Serializer):
     email = serializers.EmailField(required=True)
     confirmation_code = serializers.CharField(required=True)
+
+
+class UserInfoSerializers(serializers.Serializer):
+    email = serializers.EmailField(required=True)
+    username = serializers.CharField(required=True)
+
+    class Meta:
+        model = User
+        fields = (
+            "username",
+            "role",
+            "email",
+            "first_name",
+            "last_name",
+            "bio",
+        )

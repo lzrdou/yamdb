@@ -2,6 +2,8 @@ import uuid
 from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
 from rest_framework import viewsets, status
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.views import APIView
 from .permissions import AdminPermission
 
 from rest_framework_simplejwt.tokens import AccessToken
@@ -15,6 +17,7 @@ from serializers import (
     UserSerializer,
     ConfirmationCodeSerializer,
     UserEmailSerializer,
+    UserInfoSerializers,
 )
 
 #     ReviewSerializer,
@@ -91,3 +94,20 @@ def get_user_token(request):
     token = AccessToken.for_users(user)
 
     return Response({f"token: {token}"}, status=status.HTTP_200_OK)
+
+
+class UserInfo(APIView):
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request):
+        queryset = User.objects.get(username=request.user.username)
+        serializer = UserInfoSerializers(queryset)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def patch(self, request):
+        user = User.objects.get(username=request.user.username)
+        serializer = UserInfoSerializers(user, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

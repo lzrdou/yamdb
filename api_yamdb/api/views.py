@@ -9,12 +9,12 @@ from rest_framework.permissions import (
     IsAuthenticatedOrReadOnly,
 )
 from rest_framework.views import APIView
-from .permissions import AdminPermission
 
 from rest_framework_simplejwt.tokens import AccessToken
 from django.core.mail import send_mail
 from rest_framework.decorators import api_view
 
+from .permissions import AdminPermission, ReviewOwnerPermission
 from reviews.models import Review
 from titles.models import Category, Genre, Title
 from users.models import User
@@ -32,7 +32,11 @@ from .serializers import (
 
 
 class ReviewViewSet(viewsets.ModelViewSet):
+    """ВьюСет модель для Review."""
+
     serializer_class = ReviewSerializer
+    pagination_class = [LimitOffsetPagination]
+    permission_classes = [IsAuthenticatedOrReadOnly, ReviewOwnerPermission]
 
     def get_queryset(self):
         """Object's filter."""
@@ -40,12 +44,16 @@ class ReviewViewSet(viewsets.ModelViewSet):
         return title.reviews.all()
 
     def perform_create(self, serializer):
-        """Perform_create для ReviewViewSe (api, author=request.user)."""
+        """Perform_create для ReviewViewSet (api, author=request.user)."""
         serializer.save(author=self.request.user)
 
 
 class CommentViewSet(viewsets.ModelViewSet):
+    """ВьюСет модель для Comment."""
+
     serializer_class = CommentSerializer
+    pagination_class = [LimitOffsetPagination]
+    permission_classes = [IsAuthenticatedOrReadOnly, ReviewOwnerPermission]
 
     def get_queryset(self):
         """Object's filter."""

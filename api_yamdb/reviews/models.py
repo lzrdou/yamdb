@@ -4,7 +4,7 @@ from django.db import models
 from django.core.validators import MaxValueValidator
 from django.core.validators import MinValueValidator
 
-from users.models import User  # CHECK USER IN USERS!!!!
+from users.models import User
 from titles.models import Title
 
 text_for_view = 25  # a slice for displaying text
@@ -16,14 +16,14 @@ class Review(models.Model):
     title = models.ForeignKey(
         Title, on_delete=models.CASCADE, related_name="reviews"
     )
-    text = models.CharField()
+    text = models.TextField()
     author = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name="reviews"
     )
     score = models.PositiveIntegerField(
         default=5, validators=[MaxValueValidator(10), MinValueValidator(1)]
     )
-    pub_data = models.DateTimeField(
+    pub_date = models.DateTimeField(
         "Дата публикации отзыва", auto_now_add=True
     )
 
@@ -50,11 +50,11 @@ class Comment(models.Model):
         blank=True,
         null=True,
     )
-    text = models.CharField()
+    text = models.TextField()
     author = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name="comments"
     )
-    pub_data = models.DateTimeField(
+    pub_date = models.DateTimeField(
         "Дата публикации комментария", auto_now_add=True
     )
 

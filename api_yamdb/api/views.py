@@ -1,50 +1,103 @@
 import uuid
+from django_filters.rest_framework import DjangoFilterBackend
 from django.shortcuts import get_object_or_404
+from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.response import Response
-from rest_framework import viewsets, status
-from rest_framework.permissions import IsAuthenticated
+from rest_framework import filters, viewsets, status
+from rest_framework.permissions import (
+    IsAuthenticated,
+    IsAuthenticatedOrReadOnly,
+)
 from rest_framework.views import APIView
-from .permissions import AdminPermission
+from rest_framework.serializers import ValidationError
 
 from rest_framework_simplejwt.tokens import AccessToken
 from django.core.mail import send_mail
 from rest_framework.decorators import api_view
 
-# from reviews.models import Review, Comment
-# from titles.models import Category, Genre, Title
+from .permissions import AdminPermission, ReviewOwnerPermission
+from reviews.models import Review
+from titles.models import Category, Genre, Title
 from users.models import User
-from serializers import (
+from .serializers import (
     UserSerializer,
     ConfirmationCodeSerializer,
     UserEmailSerializer,
     UserInfoSerializers,
+    CategorySerializer,
+    GenreSerializer,
+    TitleSerializer,
+    ReviewSerializer,
+    CommentSerializer,
 )
-
-#     ReviewSerializer,
-#     CommentSerializer,
-#     CategorySerializer,
-#     GenreSerializer,
-#     TitleSerializer,
 
 
 class ReviewViewSet(viewsets.ModelViewSet):
-    pass
+    """ВьюСет модель для Review."""
+
+    serializer_class = ReviewSerializer
+    pagination_class = [LimitOffsetPagination]
+    permission_classes = [IsAuthenticatedOrReadOnly, ReviewOwnerPermission]
+
+    def get_queryset(self):
+        """Object's filter."""
+        title = get_object_or_404(Title, pk=self.kwargs.get("title_id"))
+        return title.reviews.all()
+
+    def perform_create(self, serializer):
+        """Perform_create для ReviewViewSet (api, author=request.user)."""
+        title_id = self.kwargs.get("title_id")
+        author = self.request.user
+        if Review.objects.filter(title=title_id, author=author).exists():
+            raise ValidationError("Можно оставить только один отзыв.")
+        serializer.save(author=author)
 
 
 class CommentViewSet(viewsets.ModelViewSet):
-    pass
+    """ВьюСет модель для Comment."""
+
+    serializer_class = CommentSerializer
+    pagination_class = [LimitOffsetPagination]
+    permission_classes = [IsAuthenticatedOrReadOnly, ReviewOwnerPermission]
+
+    def get_queryset(self):
+        """Object's filter."""
+        review = get_object_or_404(Review, pk=self.kwargs.get("review_id"))
+        return review.comments.all()
+
+    def perform_create(self, serializer):
+        """Perform_create для CommentViewSet (author=request.user)."""
+        serializer.save(author=self.request.user)
 
 
 class CategoryViewSet(viewsets.ModelViewSet):
-    pass
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
+    permission_classes = [IsAuthenticatedOrReadOnly, AdminPermission]
+    pagination_class = [LimitOffsetPagination]
+    filter_backends = (filters.SearchFilter,)
+    search_fields = ("name",)
 
 
 class GenreViewSet(viewsets.ModelViewSet):
-    pass
+    queryset = Genre.objects.all()
+    serializer_class = GenreSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly, AdminPermission]
+    pagination_class = [LimitOffsetPagination]
+    filter_backends = (filters.SearchFilter,)
+    search_fields = ("name",)
 
 
 class TitleViewSet(viewsets.ModelViewSet):
-    pass
+    queryset = Title.objects.all()
+    serializer_class = TitleSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly, AdminPermission]
+    pagination_class = [LimitOffsetPagination]
+    filter_backends = (
+        DjangoFilterBackend,
+        filters.SearchFilter,
+    )
+    filterset_fields = ("category", "genre", "name", "year")
 
 
 class UserViewSet(viewsets.ModelViewSet):

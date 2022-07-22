@@ -14,13 +14,23 @@ class GenreAdmin(admin.ModelAdmin):
 
 
 class TitleAdmin(admin.ModelAdmin):
-    list_display = ("id", "name", "year", "description", "genre", "category")
+    list_display = (
+        "id",
+        "name",
+        "year",
+        "description",
+        "get_genre",
+        "category",
+    )
     search_fields = ("name", "year", "genre", "category")
     list_filter = (
         "id",
         "year",
     )
     empty_value_field = "-пусто-"
+
+    def get_genre(self):
+        return "\n".join([g.genre for g in self.genre.all()])
 
 
 admin.site.register(Category, CategoryAdmin)

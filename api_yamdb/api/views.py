@@ -41,16 +41,17 @@ class ReviewViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         """Object's filter."""
-        title = get_object_or_404(Title, pk=self.kwargs.get("title_id"))
+        title = get_object_or_404(Title, id=self.kwargs.get("title_id"))
         return title.reviews.all()
 
     def perform_create(self, serializer):
         """Perform_create для ReviewViewSet (api, author=request.user)."""
         title_id = self.kwargs.get("title_id")
+        title = get_object_or_404(Title, id=title_id)
         author = self.request.user
         if Review.objects.filter(title=title_id, author=author).exists():
             raise ValidationError("Можно оставить только один отзыв.")
-        serializer.save(author=author)
+        serializer.save(author=author, title=title)
 
 
 class CommentViewSet(viewsets.ModelViewSet):

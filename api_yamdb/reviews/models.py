@@ -4,7 +4,7 @@ from django.db import models
 from django.core.validators import MaxValueValidator
 from django.core.validators import MinValueValidator
 
-from users.models import User  # CHECK USER IN USERS!!!!
+from users.models import User
 from titles.models import Title
 
 text_for_view = 25  # a slice for displaying text

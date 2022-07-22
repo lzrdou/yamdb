@@ -70,13 +70,27 @@ class UserSerializer(serializers.ModelSerializer):
         )
 
 
-class UserEmailSerializer(serializers.Serializer):
-    email = serializers.EmailField(required=True)
+class SignupSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = (
+            "username",
+            "email",
+        )
+
+    def validate_username(self, value):
+        if value == "me":
+            raise serializers.ValidationError("Имя пользователя не разрешено.")
+        return value
 
 
-class ConfirmationCodeSerializer(serializers.Serializer):
-    email = serializers.EmailField(required=True)
+class TokenSerializer(serializers.Serializer):
+    username = serializers.EmailField(required=True)
     confirmation_code = serializers.CharField(required=True)
+
+    class Meta:
+        model = User
+        fields = ("username", "confirmation_code")
 
 
 class UserInfoSerializers(serializers.Serializer):

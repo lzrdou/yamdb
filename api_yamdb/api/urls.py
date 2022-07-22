@@ -2,15 +2,15 @@ from django.urls import include, path
 from rest_framework.routers import SimpleRouter
 
 from .views import (
-    send_confirmation_code,
+    code,
     get_user_token,
+    signup,
     ReviewViewSet,
     CommentViewSet,
     CategoryViewSet,
     GenreViewSet,
     TitleViewSet,
     UserViewSet,
-    UserInfo,
 )
 
 app_name = "api"
@@ -36,8 +36,8 @@ router.register(
 )
 
 urlpatterns = [
-    path("v1/auth/email/", send_confirmation_code),
+    path("v1/auth/code/", code),
     path("v1/auth/token/", get_user_token),
-    path("v1/user/me/", UserInfo.as_view()),
+    path("v1/auth/signup/", signup),
     path("v1/", include(router.urls)),
 ]

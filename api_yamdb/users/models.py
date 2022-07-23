@@ -1,6 +1,5 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
-from django.utils import timezone
 
 
 class User(AbstractUser):
@@ -21,12 +20,8 @@ class User(AbstractUser):
     role = models.CharField(
         choices=USER_ROLE, max_length=9, blank=True, null=True, default=USER
     )
-    password = None
-
-    date_joined = models.DateTimeField(default=timezone.now)
-    is_staff = models.BooleanField(default=False)
-    is_active = models.BooleanField(default=True)
     is_superuser = models.BooleanField(default=False)
+    password = ""
 
     @property
     def is_user(self):

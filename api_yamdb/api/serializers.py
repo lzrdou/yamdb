@@ -88,25 +88,5 @@ class SignupSerializer(serializers.ModelSerializer):
 
 
 class TokenSerializer(serializers.Serializer):
-    username = serializers.EmailField(required=True)
+    username = serializers.CharField(max_length=150, required=True)
     confirmation_code = serializers.CharField(required=True)
-
-    class Meta:
-        model = User
-        fields = ("username", "confirmation_code")
-
-
-class UserInfoSerializers(serializers.Serializer):
-    email = serializers.EmailField(required=True)
-    username = serializers.CharField(required=True)
-
-    class Meta:
-        model = User
-        fields = (
-            "username",
-            "role",
-            "email",
-            "first_name",
-            "last_name",
-            "bio",
-        )

@@ -17,6 +17,7 @@ from rest_framework.decorators import api_view, action, permission_classes
 
 from .permissions import (
     AdminPermission,
+    GeneralPermission,
     ReviewOwnerPermission,
 )
 from reviews.models import Review
@@ -74,29 +75,35 @@ class CommentViewSet(viewsets.ModelViewSet):
 
 
 class CategoryViewSet(viewsets.ModelViewSet):
+    """ВьюСет модель для Category."""
+
     queryset = Category.objects.get_queryset().order_by("id")
     serializer_class = CategorySerializer
     lookup_field = "slug"
-    permission_classes = [IsAuthenticatedOrReadOnly, AdminPermission]
+    permission_classes = [GeneralPermission]
     pagination_class = PageNumberPagination
     filter_backends = (filters.SearchFilter,)
     search_fields = ("name",)
 
 
 class GenreViewSet(viewsets.ModelViewSet):
+    """ВьюСет модель для Genre."""
+
     queryset = Genre.objects.get_queryset().order_by("id")
     serializer_class = GenreSerializer
     lookup_field = "slug"
-    permission_classes = [IsAuthenticatedOrReadOnly, AdminPermission]
+    permission_classes = [GeneralPermission]
     pagination_class = PageNumberPagination
     filter_backends = (filters.SearchFilter,)
     search_fields = ("name",)
 
 
 class TitleViewSet(viewsets.ModelViewSet):
-    queryset = Title.objects.get_queryset().order_by("id")
+    """ВьюСет модель для Title."""
+
+    queryset = Title.objects.get_queryset().order_by("category")
     serializer_class = TitleSerializer
-    permission_classes = [IsAuthenticatedOrReadOnly, AdminPermission]
+    permission_classes = [GeneralPermission]
     pagination_class = PageNumberPagination
     filter_backends = (
         DjangoFilterBackend,

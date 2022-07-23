@@ -1,37 +1,37 @@
-from django_filters.rest_framework import DjangoFilterBackend
 from django.contrib.auth.tokens import default_token_generator
+from django.core.mail import send_mail
 from django.shortcuts import get_object_or_404
-from rest_framework.pagination import PageNumberPagination
-from rest_framework.response import Response
-from rest_framework import filters, viewsets, status
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import filters, mixins, status, viewsets
+from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.permissions import (
+    AllowAny,
     IsAuthenticated,
     IsAuthenticatedOrReadOnly,
-    AllowAny,
 )
+from rest_framework.response import Response
 from rest_framework.serializers import ValidationError
-
 from rest_framework_simplejwt.tokens import RefreshToken
-from django.core.mail import send_mail
-from rest_framework.decorators import api_view, action, permission_classes
+from reviews.models import Review
+from titles.models import Category, Genre, Title
+from users.models import User
 
+from .filters import TitleFilter
 from .permissions import (
     AdminPermission,
     GeneralPermission,
     ReviewOwnerPermission,
 )
-from reviews.models import Review
-from titles.models import Category, Genre, Title
-from users.models import User
 from .serializers import (
-    UserSerializer,
-    TokenSerializer,
-    SignupSerializer,
     CategorySerializer,
-    GenreSerializer,
-    TitleSerializer,
-    ReviewSerializer,
     CommentSerializer,
+    GenreSerializer,
+    ReviewSerializer,
+    SignupSerializer,
+    TitleGetSerializer,
+    TitlePostSerializer,
+    TokenSerializer,
+    UserSerializer,
 )
 
 
@@ -39,7 +39,6 @@ class ReviewViewSet(viewsets.ModelViewSet):
     """ВьюСет модель для Review."""
 
     serializer_class = ReviewSerializer
-    pagination_class = PageNumberPagination
     permission_classes = [IsAuthenticatedOrReadOnly, ReviewOwnerPermission]
 
     def get_queryset(self):
@@ -61,7 +60,6 @@ class CommentViewSet(viewsets.ModelViewSet):
     """ВьюСет модель для Comment."""
 
     serializer_class = CommentSerializer
-    pagination_class = PageNumberPagination
     permission_classes = [IsAuthenticatedOrReadOnly, ReviewOwnerPermission]
 
     def get_queryset(self):
@@ -75,26 +73,34 @@ class CommentViewSet(viewsets.ModelViewSet):
         serializer.save(author=self.request.user, review=review)
 
 
-class CategoryViewSet(viewsets.ModelViewSet):
+class CategoryViewSet(
+    mixins.CreateModelMixin,
+    mixins.DestroyModelMixin,
+    mixins.ListModelMixin,
+    viewsets.GenericViewSet,
+):
     """ВьюСет модель для Category."""
 
-    queryset = Category.objects.get_queryset().order_by("id")
+    queryset = Category.objects.all()
     serializer_class = CategorySerializer
     lookup_field = "slug"
     permission_classes = [GeneralPermission]
-    pagination_class = PageNumberPagination
     filter_backends = (filters.SearchFilter,)
     search_fields = ("name",)
 
 
-class GenreViewSet(viewsets.ModelViewSet):
+class GenreViewSet(
+    mixins.CreateModelMixin,
+    mixins.DestroyModelMixin,
+    mixins.ListModelMixin,
+    viewsets.GenericViewSet,
+):
     """ВьюСет модель для Genre."""
 
-    queryset = Genre.objects.get_queryset().order_by("id")
+    queryset = Genre.objects.all()
     serializer_class = GenreSerializer
     lookup_field = "slug"
     permission_classes = [GeneralPermission]
-    pagination_class = PageNumberPagination
     filter_backends = (filters.SearchFilter,)
     search_fields = ("name",)
 
@@ -102,15 +108,16 @@ class GenreViewSet(viewsets.ModelViewSet):
 class TitleViewSet(viewsets.ModelViewSet):
     """ВьюСет модель для Title."""
 
-    queryset = Title.objects.get_queryset().order_by("category")
-    serializer_class = TitleSerializer
+    queryset = Title.objects.all()
     permission_classes = [GeneralPermission]
-    pagination_class = PageNumberPagination
-    filter_backends = (
-        DjangoFilterBackend,
-        filters.SearchFilter,
-    )
-    filterset_fields = ("category", "genre", "name", "year")
+    filter_backends = (DjangoFilterBackend,)
+    filter_classes = [TitleFilter]
+    # filterset_fields = ("category", "genre", "name", "year")
+
+    def get_serializer_class(self):
+        if self.action == "list" or self.action == "retrieve":
+            return TitleGetSerializer
+        return TitlePostSerializer
 
 
 class UserViewSet(viewsets.ModelViewSet):

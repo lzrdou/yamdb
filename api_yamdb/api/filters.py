@@ -6,7 +6,7 @@ from titles.models import Title
 class TitleFilter(django_filters.FilterSet):
     class Meta:
         model = Title
-        fields = ["category", "genre", "name", "year"]
+        fields = ("category__slug", "genre__slug", "name", "year")
         filter_overrides = {
             models.CharField: {
                 "filter_class": django_filters.CharFilter,

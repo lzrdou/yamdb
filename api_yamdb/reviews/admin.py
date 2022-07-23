@@ -2,7 +2,7 @@
 
 from django.contrib import admin
 
-from .models import Review, Comment
+from .models import Comment, Review
 
 
 class ReviewAdmin(admin.ModelAdmin):

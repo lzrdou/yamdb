@@ -1,37 +1,37 @@
-from django_filters.rest_framework import DjangoFilterBackend
 from django.contrib.auth.tokens import default_token_generator
+from django.core.mail import send_mail
 from django.shortcuts import get_object_or_404
-from rest_framework.response import Response
-from rest_framework import filters, mixins, viewsets, status
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import filters, mixins, status, viewsets
+from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.permissions import (
+    AllowAny,
     IsAuthenticated,
     IsAuthenticatedOrReadOnly,
-    AllowAny,
 )
+from rest_framework.response import Response
 from rest_framework.serializers import ValidationError
-
 from rest_framework_simplejwt.tokens import RefreshToken
-from django.core.mail import send_mail
-from rest_framework.decorators import api_view, action, permission_classes
+from reviews.models import Review
+from titles.models import Category, Genre, Title
+from users.models import User
 
+from .filters import TitleFilter
 from .permissions import (
     AdminPermission,
     GeneralPermission,
     ReviewOwnerPermission,
 )
-from reviews.models import Review
-from titles.models import Category, Genre, Title
-from users.models import User
 from .serializers import (
-    UserSerializer,
-    TokenSerializer,
-    SignupSerializer,
     CategorySerializer,
+    CommentSerializer,
     GenreSerializer,
+    ReviewSerializer,
+    SignupSerializer,
     TitleGetSerializer,
     TitlePostSerializer,
-    ReviewSerializer,
-    CommentSerializer,
+    TokenSerializer,
+    UserSerializer,
 )
 
 
@@ -111,7 +111,8 @@ class TitleViewSet(viewsets.ModelViewSet):
     queryset = Title.objects.all()
     permission_classes = [GeneralPermission]
     filter_backends = (DjangoFilterBackend,)
-    filterset_fields = ("category", "genre", "name", "year")
+    filter_classes = [TitleFilter]
+    # filterset_fields = ("category", "genre", "name", "year")
 
     def get_serializer_class(self):
         if self.action == "list" or self.action == "retrieve":

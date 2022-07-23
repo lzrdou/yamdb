@@ -65,12 +65,13 @@ class CommentViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         """Object's filter."""
-        review = get_object_or_404(Review, pk=self.kwargs.get("review_id"))
+        review = get_object_or_404(Review, id=self.kwargs.get("review_id"))
         return review.comments.all()
 
     def perform_create(self, serializer):
         """Perform_create для CommentViewSet (author=request.user)."""
-        serializer.save(author=self.request.user)
+        review = get_object_or_404(Review, id=self.kwargs.get("review_id"))
+        serializer.save(author=self.request.user, review=review)
 
 
 class CategoryViewSet(viewsets.ModelViewSet):

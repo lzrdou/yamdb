@@ -5,7 +5,7 @@
 ## Авторы
 Проект разработан Артемием Бутырином, Матвеем Козловым и Фроликовым Сергеем при участии Yandex.Practikum.  
 ## Лицензия
-Данное программное обучение создается в учебных целях. Лицензия не объявлялась.  
+Данный проект создается в учебных целях. Лицензия не объявлялась.  
   
 ## Описание
 Проект представляет собой базу призведений книг, фильмов и музыки в целях формирования их рейтинга.  
@@ -43,6 +43,8 @@ pre-commit
 	* ```python manage.py migrate```
 6. Запустить проект:
 	* ```python manage.py runserver```
+## Документация  
+Документация доступна по адресу http://127.0.0.1:8000/redoc/  
 ## Тестирование
 ### Как запустить тесты:
 1. Запустить тесты следующей командой:
@@ -54,149 +56,148 @@ pre-commit
 3. Запустить тесты Yandex.Practikum следующей командой:
     * ```pytest ```
  
-## Примеры  
-###Endpoints:
+## Примеры некоторых Endpoints:  
 * http://127.0.0.1:8000/api/v1/categories/  
- 	```
- 	[
-  	  {
-  	    "count": 0,
-  	    "next": "string",
-  	    "previous": "string",
-   	    "results": [
-    	  {
-     			"name": "string",
-    	    		"slug": "string"
-    	 	}
-    	 	]
-  	    }
- 	]
+  ```
+	[
+	  {
+	    "count": 0,
+	    "next": "string",
+	    "previous": "string",
+	    "results": [
+	      {
+		"name": "string",
+		"slug": "string"
+	      }
+	    ]
+	  }
+	]
   ```
 * http://127.0.0.1:8000/api/v1/genres/  
- 	```
- 	[
-  		{
-  		 	"count": 0,
-  			"next": "string",
-  			"previous": "string",
-   		 	"results": [
-    	 	{
-     			"name": "string",
-    	    	"slug": "string"
-    	 	}
-    	 	]
-  	    }
- 	]
+  ```
+	[
+	  {
+	    "count": 0,
+	    "next": "string",
+	    "previous": "string",
+	    "results": [
+	      {
+		"name": "string",
+		"slug": "string"
+	      }
+	    ]
+	  }
+	]
   ```
 * http://127.0.0.1:8000/api/v1/titles/  
   ```
 	[
 	  {
-    	"count": 0,
-    	"next": "string",
-    	"previous": "string",
-   	    "results": [
-      	{
-        	"id": 0,
-        	"name": "string",
-       	    "year": 0,
-        	"rating": 0,
-        	"description": "string",
-        	"genre": [
-          	{
-            	"name": "string",
-            	"slug": "string"
-          	}
-        	],
-        	"category": {
-          		"name": "string",
-          		"slug": "string"
-        	}
-      	}
-   	    ]
-  	   }
-	  ]
+	    "count": 0,
+	    "next": "string",
+	    "previous": "string",
+	    "results": [
+	      {
+		"id": 0,
+		"name": "string",
+		"year": 0,
+		"rating": 0,
+		"description": "string",
+		"genre": [
+		  {
+		    "name": "string",
+		    "slug": "string"
+		  }
+		],
+		"category": {
+		  "name": "string",
+		  "slug": "string"
+		}
+	      }
+	    ]
+	  }
+	]
   ```
 * http://127.0.0.1:8000/api/v1/titles/{titles_id}/  
-   ```
+  ```
 	{
-  		"id": 0,
-  		"name": "string",
-  		"year": 0,
-  		"rating": 0,
-  		"description": "string",
-  		"genre": [
-    	{
-      		"name": "string",
-      		"slug": "string"
-    	}
-  		],
-  		"category": {
-    	"name": "string",
-    	"slug": "string"
-  		}
+	  "id": 0,
+	  "name": "string",
+	  "year": 0,
+	  "rating": 0,
+	  "description": "string",
+	  "genre": [
+	    {
+	      "name": "string",
+	      "slug": "string"
+	    }
+	  ],
+	  "category": {
+	    "name": "string",
+	    "slug": "string"
+	  }
 	}
    ```
 * http://127.0.0.1:8000/api/v1/titles/{title_id}/reviews/  
-	``` 
+  ``` 
 	[
-  		{
-   	 		"count": 0,
-    		"next": "string",
-    		"previous": "string",
-    		"results": [
-      		{
-        		"id": 0,
-        		"text": "string",
-        		"author": "string",
-        		"score": 1,
-        		"pub_date": "2019-08-24T14:15:22Z"
-      		}
-    		]
-  		}
-	] 
-   ```
+	  {
+	    "count": 0,
+	    "next": "string",
+	    "previous": "string",
+	    "results": [
+	      {
+		"id": 0,
+		"text": "string",
+		"author": "string",
+		"score": 1,
+		"pub_date": "2019-08-24T14:15:22Z"
+	      }
+	    ]
+	  }
+	]
+  ```
 * http://127.0.0.1:8000/api/v1/titles/{title_id}/reviews/{review_id}/  
-	```
+  ```
 	{
-  		"id": 0,
-  		"text": "string",
-  		"author": "string",
-  		"score": 1,
-  		"pub_date": "2019-08-24T14:15:22Z"
+	  "id": 0,
+	  "text": "string",
+	  "author": "string",
+	  "score": 1,
+	  "pub_date": "2019-08-24T14:15:22Z"
 	}
-	```
+  ```
 * http://127.0.0.1:8000/api/v1/titles/{title_id}/reviews/{review_id}/comments/
-	```
+  ```
 	[
-  		{
-    		"count": 0,
-    		"next": "string",
-    		"previous": "string",
-    		"results": [
-      		{
-        		"id": 0,
-        		"text": "string",
-        		"author": "string",
-        		"pub_date": "2019-08-24T14:15:22Z"
-      		}
-    		]
-  		}
+	  {
+	    "count": 0,
+	    "next": "string",
+	    "previous": "string",
+	    "results": [
+	      {
+		"id": 0,
+		"text": "string",
+		"author": "string",
+		"pub_date": "2019-08-24T14:15:22Z"
+	      }
+	    ]
+	  }
 	]
   ```  
- * http://127.0.0.1:8000/api/v1/titles/{title_id}/reviews/{review_id}/comments/{comment_id}/
-	```
+* http://127.0.0.1:8000/api/v1/titles/{title_id}/reviews/{review_id}/comments/{comment_id}/
+  ```
 	{
-  		"id": 0,
-  		"text": "string",
-  		"author": "string",
-  		"pub_date": "2019-08-24T14:15:22Z"
+	  "id": 0,
+	  "text": "string",
+	  "author": "string",
+	  "pub_date": "2019-08-24T14:15:22Z"
 	}
-  	``` 
+  ``` 
 * http://127.0.0.1:8000/api/v1/auth/signup/  
-	```
-    {
-      "email": "string",
-      "username": "string"  
-    }
-    ```
+  ```
+	{
+	  "email": "string",
+	  "username": "string"
+	}
+  ```

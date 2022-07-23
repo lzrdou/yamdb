@@ -30,6 +30,7 @@ class Review(models.Model):
     class Meta:
         """Class Meta for model Review"""
 
+        ordering = ["-id"]
         constraints = [
             models.UniqueConstraint(  # One review of the author to title
                 fields=["author", "title"], name="unique_review"
@@ -57,6 +58,9 @@ class Comment(models.Model):
     pub_date = models.DateTimeField(
         "Дата публикации комментария", auto_now_add=True
     )
+
+    class Meta:
+        ordering = ["-id"]
 
     def __str__(self):
         return self.text[:text_for_view]

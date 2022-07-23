@@ -5,13 +5,14 @@ from django.db import models
 from django.db.models import Avg
 
 
-# Получение текущего года
 def current_year():
+    """Получение текущего года."""
     return datetime.date.today().year
 
 
-# Категория
 class Category(models.Model):
+    """Категория."""
+
     name = models.CharField(max_length=256)
     slug = models.SlugField(unique=True)
 
@@ -22,8 +23,9 @@ class Category(models.Model):
         return self.name
 
 
-# Жанр
 class Genre(models.Model):
+    """Жанр."""
+
     name = models.CharField(max_length=256)
     slug = models.SlugField(unique=True)
 
@@ -34,8 +36,9 @@ class Genre(models.Model):
         return self.name
 
 
-# Произведение
 class Title(models.Model):
+    """Произведение."""
+
     name = models.CharField(max_length=512)
     year = models.PositiveIntegerField(
         default=current_year(),
@@ -58,12 +61,14 @@ class Title(models.Model):
     class Meta:
         ordering = ["id"]
 
-    # Получение среднего значения рейтинга
     @property
     def rating(self):
+        """Получение среднего значения рейтинга"""
         return self.reviews.aggregate(avg_score=Avg("score"))["avg_score"]
 
 
 class GenreTitle(models.Model):
+    """Модель для связи жанра и произведения."""
+
     genre = models.ForeignKey(Genre, on_delete=models.CASCADE)
     title = models.ForeignKey(Title, on_delete=models.CASCADE)

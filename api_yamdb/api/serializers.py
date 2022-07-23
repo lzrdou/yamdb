@@ -31,6 +31,8 @@ class CommentSerializer(serializers.ModelSerializer):
 
 
 class CategorySerializer(serializers.ModelSerializer):
+    """Сериализатор модели Category"""
+
     class Meta:
         model = Category
         fields = ("name", "slug")
@@ -38,6 +40,8 @@ class CategorySerializer(serializers.ModelSerializer):
 
 
 class GenreSerializer(serializers.ModelSerializer):
+    """Сериализатор модели Genre"""
+
     class Meta:
         model = Genre
         fields = ("name", "slug")
@@ -45,6 +49,8 @@ class GenreSerializer(serializers.ModelSerializer):
 
 
 class TitlePostSerializer(serializers.ModelSerializer):
+    """Сериализатор модели Title (Post запрос)"""
+
     description = serializers.CharField(allow_blank=True)
     category = serializers.SlugRelatedField(
         slug_field="slug", queryset=Category.objects.all()
@@ -60,6 +66,8 @@ class TitlePostSerializer(serializers.ModelSerializer):
 
 
 class TitleGetSerializer(serializers.ModelSerializer):
+    """Сериализатор модели Title (Get запрос)"""
+
     description = serializers.CharField(allow_blank=True)
     category = CategorySerializer()
     genre = GenreSerializer(many=True)
@@ -71,6 +79,8 @@ class TitleGetSerializer(serializers.ModelSerializer):
 
 
 class UserSerializer(serializers.ModelSerializer):
+    """Сериализатор модели User"""
+
     class Meta:
         model = User
         fields = (
@@ -84,6 +94,8 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class SignupSerializer(serializers.ModelSerializer):
+    """Сериализатор регистрации"""
+
     class Meta:
         model = User
         fields = (
@@ -98,5 +110,7 @@ class SignupSerializer(serializers.ModelSerializer):
 
 
 class TokenSerializer(serializers.Serializer):
+    """Сериализатор токена"""
+
     username = serializers.CharField(max_length=150, required=True)
     confirmation_code = serializers.CharField(required=True)

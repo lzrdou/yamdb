@@ -18,6 +18,8 @@ class Category(models.Model):
 
     class Meta:
         ordering = ["id"]
+        verbose_name = "Категория"
+        verbose_name_plural = "Категории"
 
     def __str__(self):
         return self.name
@@ -31,6 +33,8 @@ class Genre(models.Model):
 
     class Meta:
         ordering = ["id"]
+        verbose_name = "Жанр"
+        verbose_name_plural = "Жанры"
 
     def __str__(self):
         return self.name
@@ -39,13 +43,12 @@ class Genre(models.Model):
 class Title(models.Model):
     """Произведение."""
 
-    name = models.CharField(max_length=512)
+    name = models.TextField()
     year = models.PositiveIntegerField(
         default=current_year(),
         validators=[MinValueValidator(0), MaxValueValidator(current_year())],
     )
     description = models.TextField(
-        max_length=1024,
         blank=True,
         null=True,
     )
@@ -60,6 +63,8 @@ class Title(models.Model):
 
     class Meta:
         ordering = ["id"]
+        verbose_name = "Произведение"
+        verbose_name_plural = "Произведения"
 
     @property
     def rating(self):

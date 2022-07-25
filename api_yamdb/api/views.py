@@ -12,6 +12,7 @@ from rest_framework.permissions import (
 from rest_framework.response import Response
 from rest_framework.serializers import ValidationError
 from rest_framework_simplejwt.tokens import RefreshToken
+
 from reviews.models import Review
 from titles.models import Category, Genre, Title
 from users.models import User
@@ -73,36 +74,32 @@ class CommentViewSet(viewsets.ModelViewSet):
         serializer.save(author=self.request.user, review=review)
 
 
-class CategoryViewSet(
+class CategoryGenreParentViewSet(
     mixins.CreateModelMixin,
     mixins.DestroyModelMixin,
     mixins.ListModelMixin,
     viewsets.GenericViewSet,
 ):
+    """Родительский ВьюСет для Category и Genre."""
+
+    lookup_field = "slug"
+    permission_classes = [GeneralPermission]
+    filter_backends = (filters.SearchFilter,)
+    search_fields = ("name",)
+
+
+class CategoryViewSet(CategoryGenreParentViewSet):
     """ВьюСет модель для Category."""
 
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
-    lookup_field = "slug"
-    permission_classes = [GeneralPermission]
-    filter_backends = (filters.SearchFilter,)
-    search_fields = ("name",)
 
 
-class GenreViewSet(
-    mixins.CreateModelMixin,
-    mixins.DestroyModelMixin,
-    mixins.ListModelMixin,
-    viewsets.GenericViewSet,
-):
+class GenreViewSet(CategoryGenreParentViewSet):
     """ВьюСет модель для Genre."""
 
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
-    lookup_field = "slug"
-    permission_classes = [GeneralPermission]
-    filter_backends = (filters.SearchFilter,)
-    search_fields = ("name",)
 
 
 class TitleViewSet(viewsets.ModelViewSet):

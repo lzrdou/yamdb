@@ -129,3 +129,5 @@ SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(weeks=52),
     "AUTH_HEADER_TYPES": ("Bearer",),
 }
+
+ADMIN_EMAIL = "admin@admin.com"

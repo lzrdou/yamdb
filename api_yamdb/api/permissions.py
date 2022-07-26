@@ -5,15 +5,15 @@ class AdminPermission(permissions.BasePermission):
     def has_permission(self, request, view):
         return bool(
             request.user.is_authenticated
-            and (request.user.is_staff or request.user.role == "admin")
+            and (request.user.is_staff or request.user.is_admin)
         )
 
 
-class GeneralPermission(permissions.BasePermission):
+class AdminSafeMethodsPermission(permissions.BasePermission):
     def has_permission(self, request, view):
         return bool(
             request.user.is_authenticated
-            and (request.user.is_staff or request.user.role == "admin")
+            and (request.user.is_staff or request.user.is_admin)
             or request.method in permissions.SAFE_METHODS
         )
 
@@ -23,5 +23,5 @@ class ReviewOwnerPermission(permissions.BasePermission):
         return bool(
             request.method in permissions.SAFE_METHODS
             or obj.author == request.user
-            or request.user.role == "moderator"
+            or request.user.is_moderator
         )

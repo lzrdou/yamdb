@@ -10,9 +10,9 @@ from rest_framework.permissions import (
     IsAuthenticatedOrReadOnly,
 )
 from rest_framework.response import Response
-from rest_framework.serializers import ValidationError
 from rest_framework_simplejwt.tokens import RefreshToken
 
+from api_yamdb.settings import ADMIN_EMAIL
 from reviews.models import Review
 from titles.models import Category, Genre, Title
 from users.models import User
@@ -20,7 +20,7 @@ from users.models import User
 from .filters import TitleFilter
 from .permissions import (
     AdminPermission,
-    GeneralPermission,
+    AdminSafeMethodsPermission,
     ReviewOwnerPermission,
 )
 from .serializers import (
@@ -49,12 +49,8 @@ class ReviewViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         """Perform_create для ReviewViewSet (api, author=request.user)."""
-        title_id = self.kwargs.get("title_id")
-        title = get_object_or_404(Title, id=title_id)
-        author = self.request.user
-        if Review.objects.filter(title=title_id, author=author).exists():
-            raise ValidationError("Можно оставить только один отзыв.")
-        serializer.save(author=author, title=title)
+        title = get_object_or_404(Title, id=self.kwargs.get("title_id"))
+        serializer.save(author=self.request.user, title=title)
 
 
 class CommentViewSet(viewsets.ModelViewSet):
@@ -70,7 +66,11 @@ class CommentViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         """Perform_create для CommentViewSet (author=request.user)."""
-        review = get_object_or_404(Review, id=self.kwargs.get("review_id"))
+        review = get_object_or_404(
+            Review,
+            id=self.kwargs.get("review_id"),
+            title=self.kwargs.get("title_id"),
+        )
         serializer.save(author=self.request.user, review=review)
 
 
@@ -83,7 +83,7 @@ class CategoryGenreParentViewSet(
     """Родительский ВьюСет для Category и Genre."""
 
     lookup_field = "slug"
-    permission_classes = [GeneralPermission]
+    permission_classes = [AdminSafeMethodsPermission]
     filter_backends = (filters.SearchFilter,)
     search_fields = ("name",)
 
@@ -106,7 +106,7 @@ class TitleViewSet(viewsets.ModelViewSet):
     """ВьюСет модель для Title."""
 
     queryset = Title.objects.all()
-    permission_classes = [GeneralPermission]
+    permission_classes = [AdminSafeMethodsPermission]
     filter_backends = (DjangoFilterBackend,)
     filterset_class = TitleFilter
 
@@ -148,20 +148,19 @@ class UserViewSet(viewsets.ModelViewSet):
 @permission_classes([AllowAny])
 def code(request):
     serializer = UserSerializer(data=request.data)
-    if serializer.is_valid():
-        username = serializer.data["username"]
-        email = serializer.data["email"]
-        user = get_object_or_404(User, username=username, email=email)
-        send_confirmation_code(user)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    serializer.is_valid(raise_exception=True)
+    username = serializer.data["username"]
+    email = serializer.data["email"]
+    user = get_object_or_404(User, username=username, email=email)
+    send_confirmation_code(user)
+    return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 def send_confirmation_code(user):
     confirmation_code = default_token_generator.make_token(user)
     subject = "Код подтверждения"
     message = f"Ваш код подтверждения: {confirmation_code}"
-    admin_email = "admin@admin.com"
+    admin_email = ADMIN_EMAIL
     user_email = [user.email]
     return send_mail(subject, message, admin_email, user_email)
 
@@ -170,9 +169,7 @@ def send_confirmation_code(user):
 @permission_classes([AllowAny])
 def get_user_token(request):
     serializer = TokenSerializer(data=request.data)
-    if not serializer.is_valid():
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
+    serializer.is_valid(raise_exception=True)
     username = serializer.data["username"]
     confirmation_code = serializer.data["confirmation_code"]
 
@@ -196,8 +193,9 @@ def get_user_token(request):
 @permission_classes([AllowAny])
 def signup(request):
     serializer = SignupSerializer(data=request.data)
-    if serializer.is_valid():
-        user = serializer.save()
-        send_confirmation_code(user)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    serializer.is_valid(raise_exception=True)
+    username = serializer.data["username"]
+    email = serializer.data["email"]
+    user, created = User.objects.get_or_create(username=username, email=email)
+    send_confirmation_code(user)
+    return Response(serializer.data, status=status.HTTP_200_OK)

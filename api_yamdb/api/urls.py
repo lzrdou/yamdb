@@ -17,7 +17,7 @@ app_name = "api"
 
 router = SimpleRouter()
 
-router.register(r"categories", CategoryViewSet, basename="categories")
+router.register("categories", CategoryViewSet, basename="categories")
 
 router.register("genres", GenreViewSet, basename="genres")
 

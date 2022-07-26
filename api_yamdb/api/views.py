@@ -10,9 +10,9 @@ from rest_framework.permissions import (
     IsAuthenticatedOrReadOnly,
 )
 from rest_framework.response import Response
-from rest_framework.serializers import ValidationError
 from rest_framework_simplejwt.tokens import RefreshToken
 from api_yamdb.settings import ADMIN_EMAIL
+
 from reviews.models import Review
 from titles.models import Category, Genre, Title
 from users.models import User
@@ -49,12 +49,8 @@ class ReviewViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         """Perform_create для ReviewViewSet (api, author=request.user)."""
-        title_id = self.kwargs.get("title_id")
-        title = get_object_or_404(Title, id=title_id)
-        author = self.request.user
-        if Review.objects.filter(title=title_id, author=author).exists():
-            raise ValidationError("Можно оставить только один отзыв.")
-        serializer.save(author=author, title=title)
+        title = get_object_or_404(Title, id=self.kwargs.get("title_id"))
+        serializer.save(author=self.request.user, title=title)
 
 
 class CommentViewSet(viewsets.ModelViewSet):
@@ -70,40 +66,40 @@ class CommentViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         """Perform_create для CommentViewSet (author=request.user)."""
-        review = get_object_or_404(Review, id=self.kwargs.get("review_id"))
+        review = get_object_or_404(
+            Review,
+            id=self.kwargs.get("review_id"),
+            title=self.kwargs.get("title_id"),
+        )
         serializer.save(author=self.request.user, review=review)
 
 
-class CategoryViewSet(
+class CategoryGenreParentViewSet(
     mixins.CreateModelMixin,
     mixins.DestroyModelMixin,
     mixins.ListModelMixin,
     viewsets.GenericViewSet,
 ):
+    """Родительский ВьюСет для Category и Genre."""
+
+    lookup_field = "slug"
+    permission_classes = [AdminSafeMethodsPermission]
+    filter_backends = (filters.SearchFilter,)
+    search_fields = ("name",)
+
+
+class CategoryViewSet(CategoryGenreParentViewSet):
     """ВьюСет модель для Category."""
 
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
-    lookup_field = "slug"
-    permission_classes = [AdminSafeMethodsPermission]
-    filter_backends = (filters.SearchFilter,)
-    search_fields = ("name",)
 
 
-class GenreViewSet(
-    mixins.CreateModelMixin,
-    mixins.DestroyModelMixin,
-    mixins.ListModelMixin,
-    viewsets.GenericViewSet,
-):
+class GenreViewSet(CategoryGenreParentViewSet):
     """ВьюСет модель для Genre."""
 
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
-    lookup_field = "slug"
-    permission_classes = [AdminSafeMethodsPermission]
-    filter_backends = (filters.SearchFilter,)
-    search_fields = ("name",)
 
 
 class TitleViewSet(viewsets.ModelViewSet):

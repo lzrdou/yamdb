@@ -198,6 +198,8 @@ def get_user_token(request):
 def signup(request):
     serializer = SignupSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
-    user = serializer.save()
+    username = serializer.data["username"]
+    email = serializer.data["email"]
+    user, created = User.objects.get_or_create(username=username, email=email)
     send_confirmation_code(user)
     return Response(serializer.data, status=status.HTTP_200_OK)

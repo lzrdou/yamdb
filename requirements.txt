@@ -8,3 +8,4 @@ pytest-pythonpath==0.7.3
 pre-commit
 djangorestframework-simplejwt
 django-filter
+python-decouple

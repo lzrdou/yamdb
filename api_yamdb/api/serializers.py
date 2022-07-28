@@ -1,5 +1,5 @@
 from rest_framework import serializers
-
+from rest_framework.validators import UniqueValidator
 from reviews.models import Comment, Review
 from titles.models import Category, Genre, Title
 from users.models import User
@@ -105,15 +105,15 @@ class UserSerializer(serializers.ModelSerializer):
         )
 
 
-class SignupSerializer(serializers.ModelSerializer):
+class SignupSerializer(serializers.Serializer):
     """Сериализатор регистрации"""
 
-    class Meta:
-        model = User
-        fields = (
-            "username",
-            "email",
-        )
+    username = serializers.CharField(
+        max_length=150,
+        required=True,
+        validators=[UniqueValidator(User.objects)],
+    )
+    email = serializers.EmailField(validators=[UniqueValidator(User.objects)])
 
     def validate_username(self, value):
         if value == "me":

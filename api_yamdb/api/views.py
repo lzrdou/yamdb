@@ -61,7 +61,11 @@ class CommentViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         """Object's filter."""
-        review = get_object_or_404(Review, id=self.kwargs.get("review_id"))
+        review = get_object_or_404(
+            Review,
+            id=self.kwargs.get("review_id"),
+            title=self.kwargs.get("title_id"),
+        )
         return review.comments.all()
 
     def perform_create(self, serializer):
@@ -149,11 +153,11 @@ class UserViewSet(viewsets.ModelViewSet):
 def code(request):
     serializer = UserSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
-    username = serializer.data["username"]
-    email = serializer.data["email"]
+    username = serializer.validated_data["username"]
+    email = serializer.validated_data["email"]
     user = get_object_or_404(User, username=username, email=email)
     send_confirmation_code(user)
-    return Response(serializer.data, status=status.HTTP_200_OK)
+    return Response(serializer.validated_data, status=status.HTTP_200_OK)
 
 
 def send_confirmation_code(user):
@@ -170,8 +174,8 @@ def send_confirmation_code(user):
 def get_user_token(request):
     serializer = TokenSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
-    username = serializer.data["username"]
-    confirmation_code = serializer.data["confirmation_code"]
+    username = serializer.validated_data["username"]
+    confirmation_code = serializer.validated_data["confirmation_code"]
 
     try:
         user = User.objects.get(username=username)
@@ -194,8 +198,8 @@ def get_user_token(request):
 def signup(request):
     serializer = SignupSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
-    username = serializer.data["username"]
-    email = serializer.data["email"]
+    username = serializer.validated_data["username"]
+    email = serializer.validated_data["email"]
     user, created = User.objects.get_or_create(username=username, email=email)
     send_confirmation_code(user)
     return Response(serializer.data, status=status.HTTP_200_OK)

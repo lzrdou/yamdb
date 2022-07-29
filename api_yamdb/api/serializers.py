@@ -111,9 +111,8 @@ class SignupSerializer(serializers.Serializer):
     username = serializers.CharField(
         max_length=150,
         required=True,
-        validators=[UniqueValidator(User.objects)],
     )
-    email = serializers.EmailField(validators=[UniqueValidator(User.objects)])
+    email = serializers.EmailField()
 
     def validate_username(self, value):
         if value == "me":

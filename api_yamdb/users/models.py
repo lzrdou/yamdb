@@ -7,9 +7,9 @@ class User(AbstractUser):
     MODERATOR = "moderator"
     ADMIN = "admin"
     USER_ROLE = [
-        (USER, "user"),
-        (MODERATOR, "moderator"),
-        (ADMIN, "admin"),
+        (USER, USER),
+        (MODERATOR, MODERATOR),
+        (ADMIN, ADMIN),
     ]
 
     username = models.CharField(max_length=150, unique=True)
@@ -21,7 +21,7 @@ class User(AbstractUser):
         choices=USER_ROLE, max_length=9, blank=True, null=True, default=USER
     )
     is_superuser = models.BooleanField(default=False)
-    password = ""
+    password = models.CharField(max_length=254, default="")
     last_login = models.DateTimeField(auto_now_add=True)
 
     @property

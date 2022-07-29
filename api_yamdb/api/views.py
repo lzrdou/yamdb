@@ -196,6 +196,10 @@ def signup(request):
     serializer = SignupSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
     username = serializer.validated_data["username"]
+    if username == "me":
+        return Response(
+            "Username указан невено!", status=status.HTTP_400_BAD_REQUEST
+        )
     email = serializer.validated_data["email"]
     try:
         user, created = User.objects.get_or_create(

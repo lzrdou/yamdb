@@ -114,11 +114,6 @@ class SignupSerializer(serializers.Serializer):
     )
     email = serializers.EmailField()
 
-    def validate_username(self, value):
-        if value == "me":
-            raise serializers.ValidationError("Имя пользователя не разрешено.")
-        return value
-
 
 class TokenSerializer(serializers.Serializer):
     """Сериализатор токена"""

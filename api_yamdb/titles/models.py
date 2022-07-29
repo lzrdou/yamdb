@@ -2,7 +2,6 @@ import datetime
 
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
-from django.db.models import Avg
 
 
 def current_year():
@@ -65,11 +64,6 @@ class Title(models.Model):
         ordering = ["id"]
         verbose_name = "Произведение"
         verbose_name_plural = "Произведения"
-
-    @property
-    def rating(self):
-        """Получение среднего значения рейтинга"""
-        return self.reviews.aggregate(avg_score=Avg("score"))["avg_score"]
 
 
 class GenreTitle(models.Model):

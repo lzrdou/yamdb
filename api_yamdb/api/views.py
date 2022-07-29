@@ -1,6 +1,7 @@
 import django.db.utils
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
+from django.db.models import Avg
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, mixins, status, viewsets
@@ -18,7 +19,6 @@ from api_yamdb.settings import ADMIN_EMAIL
 from reviews.models import Review
 from titles.models import Category, Genre, Title
 from users.models import User
-
 from .filters import TitleFilter
 from .permissions import (
     AdminPermission,
@@ -111,7 +111,9 @@ class GenreViewSet(CategoryGenreParentViewSet):
 class TitleViewSet(viewsets.ModelViewSet):
     """ВьюСет модель для Title."""
 
-    queryset = Title.objects.all()
+    queryset = Title.objects.annotate(rating=Avg("reviews__score")).order_by(
+        "-id"
+    )
     permission_classes = [AdminSafeMethodsPermission]
     filter_backends = (DjangoFilterBackend,)
     filterset_class = TitleFilter
@@ -159,7 +161,7 @@ def code(request):
     email = serializer.validated_data["email"]
     user = get_object_or_404(User, username=username, email=email)
     send_confirmation_code(user)
-    return Response(serializer.data, status=status.HTTP_200_OK)
+    return Response(serializer.validated_data, status=status.HTTP_200_OK)
 
 
 def send_confirmation_code(user):

@@ -1,3 +1,4 @@
+import django.db.utils
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
 from django.db.models import Avg
@@ -5,6 +6,7 @@ from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, mixins, status, viewsets
 from rest_framework.decorators import action, api_view, permission_classes
+from rest_framework.exceptions import ValidationError
 from rest_framework.permissions import (
     AllowAny,
     IsAuthenticated,
@@ -178,14 +180,7 @@ def get_user_token(request):
     serializer.is_valid(raise_exception=True)
     username = serializer.validated_data["username"]
     confirmation_code = serializer.validated_data["confirmation_code"]
-
-    try:
-        user = User.objects.get(username=username)
-    except User.DoesNotExist:
-        return Response(
-            "Пользователь не найден", status=status.HTTP_404_NOT_FOUND
-        )
-
+    user = get_object_or_404(User, username=username)
     if not default_token_generator.check_token(user, confirmation_code):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -202,6 +197,13 @@ def signup(request):
     serializer.is_valid(raise_exception=True)
     username = serializer.validated_data["username"]
     email = serializer.validated_data["email"]
-    user, created = User.objects.get_or_create(username=username, email=email)
-    send_confirmation_code(user)
-    return Response(serializer.data, status=status.HTTP_200_OK)
+    try:
+        user, created = User.objects.get_or_create(
+            username=username, email=email
+        )
+        send_confirmation_code(user)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    except django.db.utils.IntegrityError as error:
+        raise ValidationError(
+            f"Попытка повторной записи уникального поля в БД: {error}"
+        )
